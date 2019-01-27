@@ -1,105 +1,123 @@
 <template>
-  <div class="container" @click="clickHandle('test click', $event)">
-
-    <div class="userinfo" @click="bindViewTap">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
-      <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
+  <!-- 顶部结构 -->
+  <div class="index-container">
+    <div class="search-box">
+      <input type="text" placeholder="搜索">
+      <icon type="search" size="12"></icon>
+    </div>
+    <!-- 轮播图 -->
+    <div class="swiper-container">
+      <swiper indicator-dots autoplay circular indicator-active-color="#0094ff">
+        <swiper-item v-for="item in swiperList" :key="item.image_src">
+          <img mode="aspectFill" :src="item.image_src">
+        </swiper-item>
+      </swiper>
+    </div>
+    <!-- 分类区域 -->
+    <div class="category-container">
+      <div class="item" v-for="item in categoryList">
+        <img :src="item.image_src" alt>
+        <p>{{item.name}}</p>
       </div>
     </div>
-
-    <div class="usermotto">
-      <div class="user-motto">
-        <card :text="motto"></card>
-      </div>
-    </div>
-
-    <form class="form-container">
-      <input type="text" class="form-control" v-model="motto" placeholder="v-model" />
-      <input type="text" class="form-control" v-model.lazy="motto" placeholder="v-model.lazy" />
-    </form>
-    <a href="/pages/counter/main" class="counter">去往Vuex示例页面</a>
   </div>
 </template>
 
 <script>
-import card from '@/components/card'
-
+//引入hxios模块
+import hxios from "../../utils/index.js";
 export default {
-  data () {
+  data() {
     return {
-      motto: 'Hello World',
-      userInfo: {}
-    }
+      //轮播图数组
+      swiperList: [],
+      //分类的数据
+      categoryList: []
+    };
   },
-
-  components: {
-    card
-  },
-
-  methods: {
-    bindViewTap () {
-      const url = '../logs/main'
-      wx.navigateTo({ url })
-    },
-    getUserInfo () {
-      // 调用登录接口
-      wx.login({
-        success: () => {
-          wx.getUserInfo({
-            success: (res) => {
-              this.userInfo = res.userInfo
-            }
-          })
-        }
-      })
-    },
-    clickHandle (msg, ev) {
-      console.log('clickHandle:', msg, ev)
-    }
-  },
-
-  created () {
-    // 调用应用实例的方法获取全局数据
-    this.getUserInfo()
+  //初始化的时候 获取数据
+  async created() {
+    //   轮播图数据
+    let swiperRes = await hxios.get({
+      url: "api/public/v1/home/swiperdata"
+    });
+    this.swiperList = swiperRes.data.message;
+    //分类接口数据
+    let cateGoryRes = await hxios.get({
+      url: "api/public/v1/home/catitems"
+    });
+    this.categoryList = cateGoryRes.data.message;
   }
-}
+};
 </script>
 
-<style scoped>
-.userinfo {
+<style lang="scss">
+$uRed: #ff2d4a;
+// 顶部的样式
+.index-container {
+  padding-top: 100rpx;
+}
+.search-box {
+  background-color: $uRed;
+  padding: 20rpx 16rpx;
+  box-sizing: border-box;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 0;
+  input {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 376rpx;
+    background-color: white;
+    height: 60rpx;
+    border-radius: 8rpx;
+    font-size: 24rpx;
+    margin-right: 20rpx;
+  }
+  icon {
+    position: absolute;
+    //父盒子
+    left: 50%;
+    top: 50%;
+    //自己
+    transform: translate(-50%, -50%);
+  }
+}
+//轮播图样式
+.swiper-container {
+  swiper {
+    height: 340rpx;
+    .swiper-item {
+      height: 100%;
+    }
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+// 分类的样式
+.category-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
-
-.userinfo-nickname {
-  color: #aaa;
-}
-
-.usermotto {
-  margin-top: 150px;
-}
-
-.form-control {
-  display: block;
-  padding: 0 12px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-}
-
-.counter {
-  display: inline-block;
-  margin: 10px auto;
-  padding: 5px 10px;
-  color: blue;
-  border: 1px solid blue;
+  padding-top: 24rpx;
+  padding: 29rpx;
+  background-color: white;
+  .item {
+    flex: 1;
+    img {
+      display: block;
+      width: 128rpx;
+      height: 128rpx;
+      margin: 0 auto;
+    }
+    p {
+      text-align: center;
+      margin-top: 10rpx;
+      font-size: 24rpx;
+    }
+  }
 }
 </style>
