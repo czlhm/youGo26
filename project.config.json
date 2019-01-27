@@ -33,9 +33,10 @@
 			"current": 0,
 			"list": [
 				{
-					"id": -1,
-					"name": "12",
-					"pathName": "pages/index/main",
+					"id": 0,
+					"name": "我的",
+					"pathName": "pages/mine/main",
+					"query": "",
 					"scene": null
 				}
 			]
